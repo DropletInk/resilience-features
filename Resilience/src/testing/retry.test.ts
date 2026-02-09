@@ -7,11 +7,11 @@ export const retryTest = async () => {
 
   console.log(`Attempt Number: ${count}`);
 
-  if (count < 3) {
-    throw new Error("Process failed, retrying...");
+  if (count < 5) {
+    throw new Error("Request failed, retrying limit exceeded");
   }
 
-  console.log("Success after retries");
+  console.log("Test successful");
   return "Retry handler test successful";
 };
-retryHandler(retryTest);
+retryHandler(retryTest,1);

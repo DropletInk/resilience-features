@@ -4,11 +4,12 @@ export const retryHandler = async (
   iniDelay: number = 1000,
   expBackoffMultiplier:number = 2
 ) => {
-  for (let attempt = 0; attempt < maxRetry; attempt++) {
+  for (let attempt = 0; attempt <= maxRetry; attempt++) {
     try {
-      return await fn();
+
+      return await fn() && console.log(`Success after ${attempt} retries`);
     } catch (error) {
-      if (attempt === maxRetry - 1) {
+      if (attempt === maxRetry) {
         console.error("Retry limit exceeded");
         throw error;
       }

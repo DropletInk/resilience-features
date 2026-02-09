@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 dotenv.config();
 const client = createClient({
   username: "default",
-  password: process.env.REDIS_PASS,
+  // password: process.env.REDIS_PASS,
   socket: {
-    host: "redis-18381.crce206.ap-south-1-1.ec2.cloud.redislabs.com",
-    port: 18381,
+    host: process.env.REDIS_HOST || "localhost",
+    port: Number(process.env.REDIS_PORT),
   },
 });
 

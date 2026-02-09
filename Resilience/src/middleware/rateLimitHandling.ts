@@ -21,6 +21,8 @@ export const rateLimitHandler = async (
 
     const count = await client.zCard(key);
 
+    await client.expire(key, 60);
+
     if (count > maxRequests) {
       console.log("Too many requests");
       return res.status(429).json({
@@ -28,7 +30,6 @@ export const rateLimitHandler = async (
       });
     }
 
-    await client.expire(key, 60);
 
     next();
   } catch (err) {
