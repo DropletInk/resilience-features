@@ -16,6 +16,7 @@
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "p-retry": "^7.1.1",
+    "p-timeout": "^7.0.1",
     "rate-limiter-flexible": "^9.1.1",
     "redis": "^4.7.1"
   },

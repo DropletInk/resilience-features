@@ -6,7 +6,7 @@ export const retryTest = async () => {
 
   console.log(`Attempt Number: ${count}`);
 
-  if (count < 2) {
+  if (count < 5) {
     throw new Error("Request failed, retrying limit exceeded");
   }
 
