@@ -33,6 +33,6 @@ export const retryHandler = async (
     return result;
   } catch (error) {
     console.log("Request failed after retries");
-    throw Error;
+    throw error;
   }
 };
