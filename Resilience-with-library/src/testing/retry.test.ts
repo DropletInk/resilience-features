@@ -1,16 +1,38 @@
-import { retryHandler } from "../middleware/retryHandler"
-let count = 0;
+import { retryHandler } from "../middleware/retryHandler";
 
-export const retryTest = async () => {
-  count++;
+describe("retryHandler Tests", () => {
+  test("Retry until success", async () => {
+    let count = 0;
 
-  console.log(`Attempt Number: ${count}`);
+    const result = await retryHandler(
+      async () => {
+        count++;
+        console.log(`Attempt: ${count}`);
+        if (count < 4) {
+          throw new Error("Temporary failed");
+        }
+        console.log("Success");
+        return "Success";
+      },
+      3,
+      1000,
+    );
 
-  if (count < 5) {
-    throw new Error("Request failed, retrying limit exceeded");
-  }
+    expect(result).toBe("Success");
+  }, 10000);
 
-  console.log("Test successful");
-  return "Retry handler test successful";
-};
-retryHandler(retryTest);
+  test("Fail after max retry", async () => {
+    let count = 0;
+
+    await expect(
+      retryHandler(
+        async () => {
+          count++;
+          throw new Error("Always fail");
+        },
+        2,
+        1000,
+      ),
+    ).rejects.toThrow("Always fail");
+  }, 10000);
+});

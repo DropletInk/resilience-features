@@ -26,8 +26,8 @@ npm install
 ## Environment Variables
 Create a `.env` file in the project root directory and includes details like:
 ```bash
-PORT=5000
-REDIS_PASS=YOUR_REDIS_PASSWORD
+PORT=5001
+REDIS_PORT=6379
 ```
 
 ## Run Server
@@ -35,17 +35,7 @@ REDIS_PASS=YOUR_REDIS_PASSWORD
 npm run dev
 ```
 ## Testing 
-For testing run the below commands:
-### Retry Limit Testing:
+For testing run the below command:
 ```bash
-npx tsx src/testing/retry.test.ts
+npm test
 ```
-### Timeout Testing:
-```bash
-npx tsx src/testing/timeout.test.ts
-```
-### Rate Limiting Testing:
-```bash
-npx tsx src/testing/ratelimit.test.ts
-```
-

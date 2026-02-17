@@ -1,14 +1,27 @@
-import axios from "axios";
+import { rateLimitHandler } from "../middleware/rateLimitHandler";
+import client from "../config/redis";
 
-async function testRateLimiter() {
-  for (let i = 1; i <= 10; i++) {
-    try {
-      const res = await axios.get("http://localhost:5001/user");
-      console.log(`Request ${i}:`, res.data);
-    } catch (err: any) {
-      console.log(`Request ${i}:`, err.message);
+beforeAll(async () => {
+  await client.connect();
+  await client.flushAll();
+});
+
+describe("Rate limit testing", () => {
+  test("blocks request after max request limit reached", async () => {
+    const req: any = { ip: "127.0.0.1" };
+
+    const res: any = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const next = jest.fn();
+
+    for (let i = 0; i < 7; i++) {
+      await rateLimitHandler(req, res, next);
     }
-  }
-}
 
-testRateLimiter();
+    expect(next).toHaveBeenCalledTimes(5);
+    expect(res.status).toHaveBeenCalledWith(429);
+  });
+});

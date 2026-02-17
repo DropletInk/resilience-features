@@ -1,11 +1,8 @@
 import pTimeout from "p-timeout";
 
 export const timeoutHandler = async (
-  fn: () => Promise<any>,
+  fn: () => Promise<unknown>,
   time: number = 5000,
 ) => {
-  return await pTimeout(fn(), {
-    milliseconds: time,
-    message: `Request Timeout after ${time / 1000} sec `,
-  });
+  return await pTimeout(fn(),time);
 };
