@@ -36,16 +36,7 @@ npm run dev
 ```
 ## Testing 
 For testing run the below commands:
-### Retry Limit Testing:
 ```bash
-npx tsx src/testing/retry.test.ts
-```
-### Timeout Testing:
-```bash
-npx tsx src/testing/timeout.test.ts
-```
-### Rate Limiting Testing:
-```bash
-npx tsx src/testing/ratelimit.test.ts
+npm test
 ```
 
