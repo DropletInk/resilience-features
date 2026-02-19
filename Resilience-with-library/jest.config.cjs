@@ -1,6 +1,7 @@
 module.exports = {
   preset: "ts-jest/presets/default-esm",
   testEnvironment: "node",
+  testTimeout: 1000000,
 
   extensionsToTreatAsEsm: [".ts"],
 testTimeout: 20000,

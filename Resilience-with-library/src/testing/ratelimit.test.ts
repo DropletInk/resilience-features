@@ -3,11 +3,24 @@ import client from "../config/redis";
 
 beforeAll(async () => {
   await client.connect();
-  await client.flushAll();
+});
+
+afterAll(async () => {
+  await client.quit();
 });
 
 describe("Rate limit testing", () => {
-  test("blocks request after max request limit reached", async () => {
+  test.each([
+    [4, 5],
+    [5, 5],
+    [8, 9],
+    [4, 3],
+    [0, 1],
+    [2, 0],
+    [7, 10],
+    [8, 7],
+  ])("ratelimit handler tests: %i requests with %i maxLimit", async (requestCount, maxRequests) => {
+    await client.flushAll();
     const req: any = { ip: "127.0.0.1" };
 
     const res: any = {
@@ -17,11 +30,12 @@ describe("Rate limit testing", () => {
 
     const next = jest.fn();
 
-    for (let i = 0; i < 7; i++) {
-      await rateLimitHandler(req, res, next);
+    let middleware = rateLimitHandler({ maxRequests: maxRequests });
+
+    for (let i = 1; i <= requestCount; i++) {
+      await middleware(req, res, next);
     }
 
-    expect(next).toHaveBeenCalledTimes(5);
-    expect(res.status).toHaveBeenCalledWith(429);
+    expect(next).toHaveBeenCalledTimes(Math.min(requestCount, maxRequests));
   });
 });

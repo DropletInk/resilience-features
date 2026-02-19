@@ -1,8 +1,13 @@
 import pTimeout from "p-timeout";
 
-export const timeoutHandler = async (
-  fn: () => Promise<unknown>,
-  time: number = 5000,
-) => {
-  return await pTimeout(fn(),time);
+type timeoutOptions<T> = {
+  fn: () => Promise<T>;
+  time: number;
+};
+
+export const timeoutHandler = async <T>({
+  fn,
+  time,
+}: timeoutOptions<T>) => {
+  return await pTimeout(fn(), time);
 };
