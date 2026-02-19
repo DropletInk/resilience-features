@@ -1,17 +1,50 @@
 import { retryHandler } from "../middleware/retryHandler";
 
-let count = 0;
+describe("retryHandler Tests", () => {
+  test.each([
+    [0, 1, "Success"],
+    [2, 3, "Success"],
+    [4, 4, "Success"],
+    [6, 8, "Success"],
+    [7, 6, "Success"],
+    [9, 8, "Success"],
+  ])(
+    "Success test cases of retry handler",
+    async (failCount, maxRetry, expectedResult) => {
+      let count = 0;
+      let res = await retryHandler({
+        fn: async () => {
+          count++;
+          if (count < failCount) {
+            throw new Error("Temporary failed");
+          }
+          return "Success";
+        },
+        maxRetry: maxRetry,
+      });
 
-export const retryTest = async () => {
-  count++;
+      expect(res).toBe(expectedResult);
+    },
+  );
 
-  console.log(`Attempt Number: ${count}`);
-
-  if (count < 2) {
-    throw new Error("Request failed, retrying limit exceeded");
-  }
-
-  console.log("Test successful");
-  return "Retry handler test successful";
-};
-retryHandler(retryTest);
+  test.each([
+    [2, 0],
+    [3, 1],
+    [6, 4],
+    [5, 2],
+    [10, 5],
+  ])("Failure test cases", async (failCount, maxRetry) => {
+    let count = 0;
+    await expect(
+      retryHandler({
+        fn: async () => {
+          count++;
+          if (count < failCount) {
+            throw new Error("Always fail");
+          }
+        },
+        maxRetry: maxRetry,
+      }),
+    ).rejects.toThrow("Always fail");
+  });
+});
