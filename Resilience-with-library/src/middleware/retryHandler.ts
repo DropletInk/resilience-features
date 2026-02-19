@@ -3,16 +3,16 @@ import pRetry from "p-retry";
 type RetryOptions<T> = {
   fn: () => Promise<T>;
   maxRetry: number;
-  iniDelay: number;
-  exBackoffMultiplier: number;
+  iniDelay?: number;
+  exBackoffMultiplier?: number;
 };
 
 export const retryHandler = async <T>({
   fn,
   maxRetry,
-  iniDelay,
-  exBackoffMultiplier,
-}: RetryOptions<T>): Promise<T> => {
+  iniDelay = 1000,
+  exBackoffMultiplier = 2,
+}: RetryOptions<T>) => {
   try {
     const result = await pRetry(
       async () => {
@@ -36,7 +36,7 @@ export const retryHandler = async <T>({
         },
       },
     );
-    // console.log("Success");
+    console.log("Success");
     return result;
   } catch (error) {
     console.log("Request failed after retries");

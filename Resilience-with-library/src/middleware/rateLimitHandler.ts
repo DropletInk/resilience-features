@@ -4,11 +4,11 @@ import { RateLimiterRedis } from "rate-limiter-flexible";
 
 type rateLimitOptions = {
   maxRequests: number;
-  durationInSec: number;
+  durationInSec?: number;
 };
 
 export const rateLimitHandler =
-  async ({ maxRequests, durationInSec }: rateLimitOptions) =>
+  ({ maxRequests, durationInSec = 60 }: rateLimitOptions) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const rateLimiter = new RateLimiterRedis({
@@ -22,7 +22,8 @@ export const rateLimitHandler =
       console.log(`Request passed ${res.consumedPoints} times`);
       next();
     } catch (error) {
-      console.error("Rate Limit:", error);
+      // console.error("Rate Limit:", error);
+      console.log("Rate limit exceeded")
       res.status(429).json({ message: "Too many requests" });
     }
   };
