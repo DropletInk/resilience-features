@@ -4,7 +4,7 @@ module.exports = {
   testTimeout: 1000000,
 
   extensionsToTreatAsEsm: [".ts"],
-
+testTimeout: 20000,
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   transformIgnorePatterns: [
-    "/node_modules/(?!p-retry|is-network-error)"
+    "/node_modules/(?!p-retry|is-network-error)",
   ],
 
   moduleNameMapper: {

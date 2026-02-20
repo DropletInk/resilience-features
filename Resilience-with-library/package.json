@@ -16,6 +16,7 @@
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "p-retry": "^6.2.1",
+    "p-timeout": "^4.1.0",
     "rate-limiter-flexible": "^9.1.1",
     "redis": "^4.7.1"
   },
@@ -25,6 +26,7 @@
     "@babel/preset-typescript": "^7.28.5",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
+    "@types/p-timeout": "^1.2.1",
     "babel-jest": "^30.2.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
