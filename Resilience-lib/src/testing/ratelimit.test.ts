@@ -1,5 +1,6 @@
-import { rateLimitHandler } from "../middleware/ratelimitHandler";
-import {createRedisClient} from "../config/redis";
+import { jest } from "@jest/globals";
+import { rateLimitHandler } from "../middleware/ratelimitHandler.js";
+import {createRedisClient} from "../config/redis.js";
 
 const client = createRedisClient({ url: "redis://localhost:6379" });
 

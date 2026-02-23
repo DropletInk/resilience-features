@@ -1,4 +1,4 @@
-import { retryHandler } from "../middleware/retryHandler";
+import { retryHandler } from "../middleware/retryHandler.js";
 
 describe("retryHandler Tests", () => {
   test.each([

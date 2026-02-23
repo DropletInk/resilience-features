@@ -5,10 +5,7 @@ type TimeoutOptions<T> = {
   time: number;
 };
 
-export const timeoutHandler = <T>({
-  fn,
-  time,
-}: TimeoutOptions<T>) => {
+export const timeoutHandler = <T>({ fn, time }: TimeoutOptions<T>) => {
   return pTimeout(fn(), {
     milliseconds: time,
   });

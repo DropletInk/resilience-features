@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { RateLimiterRedis } from "rate-limiter-flexible";
-import { createRedisClient } from "../config/redis";
+import { createRedisClient } from "../config/redis.js";
 
 type RedisClient = ReturnType<typeof createRedisClient>;
 
@@ -11,7 +11,7 @@ type rateLimitOptions = {
 };
 
 export const rateLimitHandler =
-  ({client, maxRequests, durationInSec = 60 }: rateLimitOptions) =>
+  ({ client, maxRequests, durationInSec = 60 }: rateLimitOptions) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const rateLimiter = new RateLimiterRedis({
@@ -26,7 +26,7 @@ export const rateLimitHandler =
       next();
     } catch (error) {
       // console.error("Rate Limit:", error);
-      console.log("Rate limit exceeded")
+      console.log("Rate limit exceeded");
       res.status(429).json({ message: "Too many requests" });
     }
   };
