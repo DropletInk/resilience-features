@@ -1,6 +1,6 @@
 import { createClient } from "redis";
-// In RedisClientOptions need to pass data like 
-// socket: 
+// In RedisClientOptions need to pass data like
+// socket:
 // {
 //   host: "localhost",
 //   port: 6379

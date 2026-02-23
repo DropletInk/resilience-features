@@ -1,14 +1,15 @@
 {
-  "name": "resilience-lib",
+  "name": "@palashsarkar07/resilience-library",
   "version": "1.0.0",
-  "description": "It is resilience library",
+  "description": "This is resilience library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "tsc"
   },
+  "publishConfig": { "registry": "https://npm.pkg.github.com" },
+  "files": ["dist"],
   "keywords": [],
   "author": "",
   "license": "ISC",
