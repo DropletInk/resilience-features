@@ -1,6 +1,6 @@
 {
-  "name": "@palashsarkar07/resilience-library",
-  "version": "1.0.0",
+  "name": "@dropletink/resilience-library",
+  "version": "1.0.3",
   "description": "This is resilience library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,8 +8,16 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "build": "tsc"
   },
-  "publishConfig": { "registry": "https://npm.pkg.github.com" },
-  "files": ["dist"],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DropletInk/resilience-features.git"
+  },
+  "files": [
+    "dist"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",

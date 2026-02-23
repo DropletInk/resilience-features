@@ -1,13 +1,5 @@
 import { createClient, RedisClientOptions } from "redis";
 
-// In RedisClientOptions need to pass data like
-// socket:
-// {
-//   host: "localhost",
-//   port: 6379
-// }
-// or, { url: "redis://localhost:6379" }
-
 export const createRedisClient = (options?: RedisClientOptions) => {
   const client = createClient(options);
 
