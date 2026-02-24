@@ -10,19 +10,22 @@ type rateLimitOptions = {
   durationInSec?: number;
 };
 
-export const rateLimitHandler =
-  ({ client, maxRequests, durationInSec = 60 }: rateLimitOptions) =>
-  async (req: Request, res: Response, next: NextFunction) => {
+export const rateLimitHandler = ({
+  client,
+  maxRequests,
+  durationInSec = 60,
+}: rateLimitOptions) => {
+  const rateLimiter = new RateLimiterRedis({
+    storeClient: client,
+    points: maxRequests,
+    duration: durationInSec,
+  });
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const rateLimiter = new RateLimiterRedis({
-        storeClient: client,
-        points: maxRequests,
-        duration: durationInSec,
-      });
-      const res = await rateLimiter.consume(req.ip!);
+      const result = await rateLimiter.consume(req.ip!);
 
       console.log("IP:", req.ip);
-      console.log(`Request passed ${res.consumedPoints} times`);
+      console.log(`Request passed ${result.consumedPoints} times`);
       next();
     } catch (error) {
       // console.error("Rate Limit:", error);
@@ -30,3 +33,4 @@ export const rateLimitHandler =
       res.status(429).json({ message: "Too many requests" });
     }
   };
+};

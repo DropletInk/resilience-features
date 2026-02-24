@@ -1,6 +1,13 @@
-import { jest } from "@jest/globals";
 import { rateLimitHandler } from "../middleware/ratelimitHandler.js";
-import {createRedisClient} from "../config/redis.js";
+import { createRedisClient } from "../config/redis.js";
+import {
+  describe,
+  test,
+  expect,
+  beforeAll,
+  afterAll,
+  jest,
+} from "@jest/globals";
 
 const client = createRedisClient({ url: "redis://localhost:6379" });
 
@@ -22,23 +29,29 @@ describe("Rate limit testing", () => {
     [2, 0],
     [7, 10],
     [8, 7],
-  ])("ratelimit handler tests: %i requests with %i maxLimit", async (requestCount, maxRequests) => {
-    await client.flushAll();
-    const req: any = { ip: "127.0.0.1" };
+  ])(
+    "ratelimit handler tests: %i requests with %i maxLimit",
+    async (requestCount, maxRequests) => {
+      await client.flushAll();
+      const req: any = { ip: "127.0.0.1" };
 
-    const res: any = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
+      const res: any = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
 
-    const next = jest.fn();
+      const next = jest.fn();
 
-    let middleware = rateLimitHandler({client:client, maxRequests: maxRequests });
+      let middleware = rateLimitHandler({
+        client: client,
+        maxRequests: maxRequests,
+      });
 
-    for (let i = 1; i <= requestCount; i++) {
-      await middleware(req, res, next);
-    }
+      for (let i = 1; i <= requestCount; i++) {
+        await middleware(req, res, next);
+      }
 
-    expect(next).toHaveBeenCalledTimes(Math.min(requestCount, maxRequests));
-  });
+      expect(next).toHaveBeenCalledTimes(Math.min(requestCount, maxRequests));
+    },
+  );
 });
