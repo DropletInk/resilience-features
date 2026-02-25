@@ -25,7 +25,7 @@ npm install git+https://github.com/DropletInk/resilience-features.git
 ### Create and Connect redis client
 Redis is required only for rate limiting.
  
-### Example
+#### Example
 ```ts
 import { createRedisClient } from "resilience-library";
  

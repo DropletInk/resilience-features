@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "build"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
@@ -15,9 +16,7 @@
     "type": "git",
     "url": "https://github.com/DropletInk/resilience-features.git"
   },
-  "files": [
-    "dist"
-  ],
+ 
   "keywords": [],
   "author": "",
   "license": "ISC",
