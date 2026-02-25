@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { RateLimiterRedis } from "rate-limiter-flexible";
-import { createRedisClient } from "../config/redis";
+import { createRedisClient } from "../config/redis.js";
 
 type RedisClient = ReturnType<typeof createRedisClient>;
 

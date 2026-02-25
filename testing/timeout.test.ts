@@ -1,4 +1,4 @@
-import { timeoutHandler } from "../src/middleware/timeoutHandler";
+import { timeoutHandler } from "../src/middleware/timeoutHandler.js";
 import { describe, test, expect } from "@jest/globals";
 describe("Timeout Handler Test", () => {
   test.each([
@@ -24,7 +24,7 @@ describe("Timeout Handler Test", () => {
     [5000, 2000],
     [4000, 3999],
     [6000, 5000],
-    [8000, 7990],
+    [8000, 7990]
   ])("Failed after timeout", async (timeRequired, maxTimeoutTime) => {
     await expect(
       timeoutHandler({

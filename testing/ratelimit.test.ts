@@ -1,5 +1,5 @@
-import { rateLimitHandler } from "../src/middleware/ratelimitHandler";
-import { createRedisClient } from "../src/config/redis";
+import { rateLimitHandler } from "../src/middleware/ratelimitHandler.js";
+import { createRedisClient } from "../src/config/redis.js";
 import { Request, Response } from "express";
 import {
   describe,
