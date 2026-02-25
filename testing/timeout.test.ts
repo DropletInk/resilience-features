@@ -1,4 +1,4 @@
-import { timeoutHandler } from "../middleware/timeoutHandler.js";
+import { timeoutHandler } from "../src/middleware/timeoutHandler";
 import { describe, test, expect } from "@jest/globals";
 describe("Timeout Handler Test", () => {
   test.each([

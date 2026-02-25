@@ -1,18 +1,13 @@
 module.exports = {
-  preset: "ts-jest/presets/default-esm",
+  preset: "ts-jest",
   testEnvironment: "node",
-  testTimeout:500000,
-  extensionsToTreatAsEsm: [".ts"],
+  verbose: true,
+  testTimeout: 500000,
   transform: {
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      {
-        useESM: true,
-        tsconfig: "tsconfig.test.json"
-      }
-    ]
+    "^.+\\.tsx?$": "ts-jest",
+    "^.+\\.js$": "babel-jest",
   },
-  moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1"
-  }
+  transformIgnorePatterns: [
+    "/node_modules/(?!(p-timeout|p-retry|is-network-error)/)",
+  ],
 };

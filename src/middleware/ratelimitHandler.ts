@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import { RateLimiterRedis } from "rate-limiter-flexible";
-import { createRedisClient } from "../config/redis.js";
+import { createRedisClient } from "../config/redis";
 
 type RedisClient = ReturnType<typeof createRedisClient>;
 
 type rateLimitOptions = {
   client: RedisClient;
-  maxRequests: number;
+  maxRequests?: number;
   durationInSec?: number;
 };
 
 export const rateLimitHandler = ({
   client,
-  maxRequests,
+  maxRequests = 5,
   durationInSec = 60,
 }: rateLimitOptions) => {
   const rateLimiter = new RateLimiterRedis({

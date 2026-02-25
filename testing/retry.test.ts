@@ -1,4 +1,4 @@
-import { retryHandler } from "../middleware/retryHandler.js";
+import { retryHandler } from "../src/middleware/retryHandler";
 import { describe, test, expect } from "@jest/globals";
 describe("retryHandler Tests", () => {
   test.each([

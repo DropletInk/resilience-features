@@ -2,14 +2,14 @@ import pRetry from "p-retry";
 
 type RetryOptions<T> = {
   fn: () => Promise<T>;
-  maxRetry: number;
+  maxRetry?: number;
   iniDelay?: number;
   exBackoffMultiplier?: number;
 };
 
 export const retryHandler = async <T>({
   fn,
-  maxRetry,
+  maxRetry = 3,
   iniDelay = 1000,
   exBackoffMultiplier = 2,
 }: RetryOptions<T>) => {

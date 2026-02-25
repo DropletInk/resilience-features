@@ -1,5 +1,6 @@
-import { rateLimitHandler } from "../middleware/ratelimitHandler.js";
-import { createRedisClient } from "../config/redis.js";
+import { rateLimitHandler } from "../src/middleware/ratelimitHandler";
+import { createRedisClient } from "../src/config/redis";
+import { Request, Response } from "express";
 import {
   describe,
   test,
@@ -33,12 +34,13 @@ describe("Rate limit testing", () => {
     "ratelimit handler tests: %i requests with %i maxLimit",
     async (requestCount, maxRequests) => {
       await client.flushAll();
-      const req: any = { ip: "127.0.0.1" };
 
-      const res: any = {
+      const req = { ip: "127.0.0.1" } as Request;
+
+      const res = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn(),
-      };
+      } as unknown as Response;
 
       const next = jest.fn();
 

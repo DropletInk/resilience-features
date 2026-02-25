@@ -1,7 +1,13 @@
-import pRetry from "p-retry";
-export const retryHandler = async ({ fn, maxRetry, iniDelay = 1000, exBackoffMultiplier = 2, }) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.retryHandler = void 0;
+const p_retry_1 = __importDefault(require("p-retry"));
+const retryHandler = async ({ fn, maxRetry = 3, iniDelay = 1000, exBackoffMultiplier = 2, }) => {
     try {
-        const result = await pRetry(async () => {
+        const result = await (0, p_retry_1.default)(async () => {
             return await fn();
         }, {
             retries: maxRetry,
@@ -24,3 +30,4 @@ export const retryHandler = async ({ fn, maxRetry, iniDelay = 1000, exBackoffMul
         throw error;
     }
 };
+exports.retryHandler = retryHandler;

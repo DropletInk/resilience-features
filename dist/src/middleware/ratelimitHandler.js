@@ -1,6 +1,9 @@
-import { RateLimiterRedis } from "rate-limiter-flexible";
-export const rateLimitHandler = ({ client, maxRequests, durationInSec = 60, }) => {
-    const rateLimiter = new RateLimiterRedis({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.rateLimitHandler = void 0;
+const rate_limiter_flexible_1 = require("rate-limiter-flexible");
+const rateLimitHandler = ({ client, maxRequests = 5, durationInSec = 60, }) => {
+    const rateLimiter = new rate_limiter_flexible_1.RateLimiterRedis({
         storeClient: client,
         points: maxRequests,
         duration: durationInSec,
@@ -19,3 +22,4 @@ export const rateLimitHandler = ({ client, maxRequests, durationInSec = 60, }) =
         }
     };
 };
+exports.rateLimitHandler = rateLimitHandler;
