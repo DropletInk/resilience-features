@@ -7,6 +7,7 @@ module.exports = {
     "^.+\\.tsx?$": "ts-jest",
     "^.+\\.js$": "babel-jest",
   },
+  testMatch: ["<rootDir>/dist/**/*.test.js"],
   transformIgnorePatterns: [
     "/node_modules/(?!(p-timeout|p-retry|is-network-error)/)",
   ],
