@@ -109,17 +109,20 @@ app.use(
 rateLimitHandler({
 client,
 maxRequests: 5,
-durationInSec: 60
+durationInSec: 60,
+keyPrefix: "api-limit"
 })
 );
 ```
 In the above Example,
+
+#### **Required**
  
-**`client`:**
+- **`client`:**
  
 It refers to the Redis Client instance passed to the middleware. It allows the rate limiter to store request counts.
  
-**`maxRequests`:**
+- **`maxRequests`:**
  
 It specifies the maximum number of requests allowed from a client within the defined time duration.
  
@@ -127,14 +130,76 @@ It specifies the maximum number of requests allowed from a client within the def
  
 The value of maxRequests is configurable.
  
-**`durationInSec`:**
+- **`durationInSec`:**
  
 It controls the time window for rate limiting. It defines how long the request limit remains active before resetting.
  
 `Default` value is `60` secs.
  
 The value of durationInSec is configurable.
- 
+
+- **`keyPrefix`**
+
+Prefix added to all Redis rate limit keys.
+
+#### **Optional**
+
+- **`blockDurationInSec`**
+
+Duration in seconds to block requests after limit exceeded.
+
+`Default`: `0`
+
+- **`keyGenerator`**
+
+It is the function to generate custom key for rate limiting.
+
+`Default`: Uses IP, username, HTTP method and endpoint path if available.
+
+***Example***
+```ts
+keyGenerator = (req) => {
+    const ip = req.ip ?? "unknown-ip";
+    const username = (req as any).user?.username ?? "unknown-user";
+    const method = req.method ?? "unknown-metod";
+    const endpoint = req.path ?? "unknown-endpoints";
+    return `${ip}:${username}:${method}:${endpoint}`;
+  }
+  ```
+  - **`execEvenly`**
+
+Spreads requests evenly across duration window.
+
+`Default`: false
+
+- **`InMemoryBlockOnCosumed`**
+
+Enables temporary in-memory blocking when limit reached.
+
+`Default`: equals to `maxRequests`.
+
+- **`enableHeaders`**
+
+Adds rate limit headers in response:
+
+1. RateLimit-Limit
+
+2. RateLimit-Remaining
+
+3. RateLimit-Reset
+
+4. Retry-After
+
+`Default`: false
+
+- **`enableInsuranceLimiter`**
+
+Enables in-memory fallback limiter if Redis fails.
+
+
+`Default`: false
+
+
 > **NOTE:**
  
 Before use of ratelimiting make sure that RedisClient is created and connected.
