@@ -1,4 +1,7 @@
-import { rateLimitHandler } from "../src/middleware/ratelimitHandler.js";
+import {
+  rateLimitHandler,
+  RateLimiterFactory,
+} from "../src/middleware/ratelimitHandler.js";
 import { createRedisClient } from "../src/config/redis.js";
 import { Request, Response } from "express";
 import {
@@ -11,12 +14,7 @@ import {
 } from "@jest/globals";
 
 const client = createRedisClient({
-    username: 'default',
-    password: 'Q3QuStLov8vxvNqykPyj1bOpk8tccOkv',
-    socket: {
-        host: 'redis-14227.crce281.ap-south-1-3.ec2.cloud.redislabs.com',
-        port: 14227
-    }
+  url: "redis://localhost:6379",
 });
 
 beforeAll(async () => {
@@ -28,8 +26,6 @@ afterAll(async () => {
 });
 
 describe("Rate limit testing", () => {
-
-
   test.each([
     [4, 5],
     [5, 5],
@@ -42,7 +38,6 @@ describe("Rate limit testing", () => {
   ])(
     "ratelimit handler tests: %i requests with %i maxLimit",
     async (requestCount, maxRequests) => {
-
       await client.flushAll();
 
       const req = {
@@ -57,21 +52,21 @@ describe("Rate limit testing", () => {
 
       const next = jest.fn();
 
-      const middleware = rateLimitHandler({
-        client: client,
-        maxRequests: maxRequests,
-        durationInSec: 60,     
+      const testLimiter = RateLimiterFactory.advancedRedis({
+        storeClient: client,
+        points: maxRequests,
         keyPrefix: "test-key",
-        enableHeaders: false,
+      });
+
+      const middleware = rateLimitHandler({
+        rateLimiter: testLimiter,
       });
 
       for (let i = 1; i <= requestCount; i++) {
         await middleware(req, res, next);
       }
 
-      expect(next).toHaveBeenCalledTimes(
-        Math.min(requestCount, maxRequests)
-      );
-    }
+      expect(next).toHaveBeenCalledTimes(Math.min(requestCount, maxRequests));
+    },
   );
 });

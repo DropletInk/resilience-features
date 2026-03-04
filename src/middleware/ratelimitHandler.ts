@@ -1,75 +1,97 @@
 import { NextFunction, Request, Response } from "express";
-import { RateLimiterRedis, RateLimiterMemory } from "rate-limiter-flexible";
+import {
+  RateLimiterRedis,
+  RateLimiterMemory,
+  RateLimiterMongo,
+} from "rate-limiter-flexible";
 import { createRedisClient } from "../config/redis.js";
 
 type RedisClient = ReturnType<typeof createRedisClient>;
 
 type rateLimitOptions = {
-  client: RedisClient;
-  maxRequests: number;
-  durationInSec: number;
-  blockDurationInSec?: number;
-  keyPrefix: string;
+  rateLimiter: RateLimiterRedis | RateLimiterMemory;
   keyGenerator?: (req: Request) => string;
-  execEvenly?: boolean;
-  inMemoryBlockOnConsumed?: number;
   enableHeaders?: boolean;
-  enableInsuranceLimiter?: boolean;
+};
+
+type BasicRedisOptions = {
+  client: RedisClient;
+  points?: number;
+  duration?: number;
+  blockDuration?: number;
+  keyPrefix?: string;
+  execEvenly?: boolean;
+};
+
+export const RateLimiterFactory = {
+  basicRedis: ({
+    client,
+    points = 5,
+    duration = 60,
+    blockDuration = 0,
+    keyPrefix = "rate-limit",
+    execEvenly = false,
+  }: BasicRedisOptions): RateLimiterRedis => {
+    return new RateLimiterRedis({
+      storeClient: client,
+      points,
+      duration,
+      blockDuration,
+      keyPrefix,
+      execEvenly,
+    });
+  },
+
+  advancedRedis: (
+    options: ConstructorParameters<typeof RateLimiterRedis>[0],
+  ): RateLimiterRedis => {
+    return new RateLimiterRedis(options);
+  },
+
+  inMemoryLimiter: (
+    options: ConstructorParameters<typeof RateLimiterMemory>[0],
+  ): RateLimiterMemory => {
+    return new RateLimiterMemory(options);
+  },
+
+  mongoLimiter: (
+    options: ConstructorParameters<typeof RateLimiterMongo>[0],
+  ): RateLimiterMongo => {
+    return new RateLimiterMongo(options);
+  },
 };
 
 export const rateLimitHandler = ({
-  client,
-  maxRequests,
-  durationInSec,
-  blockDurationInSec = 0,
-  keyPrefix,
+  rateLimiter,
+  enableHeaders = false,
   keyGenerator = (req) => {
     const ip = req.ip ?? "unknown-ip";
     const username = (req as any).user?.username ?? "unknown-user";
-    const method = req.method ?? "unknown-metod";
+    const method = req.method ?? "unknown-method";
     const endpoint = req.path ?? "unknown-endpoints";
     return `${ip}:${username}:${method}:${endpoint}`;
   },
-  execEvenly = false,
-  inMemoryBlockOnConsumed,
-  enableHeaders = false,
-  enableInsuranceLimiter = false,
 }: rateLimitOptions) => {
-  const memoryFallback = enableInsuranceLimiter
-    ? new RateLimiterMemory({
-        points: maxRequests,
-        duration: durationInSec,
-      })
-    : undefined;
-
-  const rateLimiter = new RateLimiterRedis({
-    storeClient: client,
-    points: maxRequests,
-    duration: durationInSec,
-    blockDuration: blockDurationInSec,
-    keyPrefix,
-    execEvenly,
-    inMemoryBlockOnConsumed: inMemoryBlockOnConsumed ?? maxRequests,
-    insuranceLimiter: memoryFallback,
-  });
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const key = keyGenerator(req);
 
       const result = await rateLimiter.consume(key);
 
+      if (enableHeaders) {
+        res.setHeader("RateLimit-Limit", rateLimiter.points);
+        res.setHeader("RateLimit-Remaining", result.remainingPoints);
+        res.setHeader("RateLimit-Reset", Math.ceil(result.msBeforeNext / 1000));
+      }
+
       console.log("Key: ", key);
       console.log(`Request passed ${result.consumedPoints} times`);
-      if (enableHeaders) {
-        res.setHeader("RateLimit-limit", maxRequests);
-        res.setHeader("RateLimit-remaining", result.remainingPoints);
-        res.setHeader("Ratelimit-Reset", Math.ceil(result.msBeforeNext / 1000));
-      }
-      return next();
+
+      next();
     } catch (error: any) {
       if (typeof error.msBeforeNext === "number") {
         if (enableHeaders) {
-          res.setHeader("Retry-after", Math.ceil(error.msBeforeNext / 1000));
+          res.setHeader("Retry-After", Math.ceil(error.msBeforeNext / 1000));
         }
         return res.status(429).json({ message: "Too many requests" });
       }
