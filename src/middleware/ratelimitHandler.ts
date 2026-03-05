@@ -9,7 +9,7 @@ import { createRedisClient } from "../config/redis.js";
 type RedisClient = ReturnType<typeof createRedisClient>;
 
 type rateLimitOptions = {
-  rateLimiter: RateLimiterRedis | RateLimiterMemory;
+  rateLimiter: RateLimiterRedis | RateLimiterMemory | RateLimiterMongo;
   keyGenerator?: (req: Request) => string;
   enableHeaders?: boolean;
 };
