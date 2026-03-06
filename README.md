@@ -139,7 +139,12 @@ app.use(
     rateLimiter: limiter,
     keyGenerator = (req) => {
       const ip = req.ip ?? "unknown-ip";
-      const username = (req as any).user?.username || req.body?.username || "unknown-user";
+      const username =
+        (req as any).user?.email ||
+        (req as any).user?.username ||
+        req.body?.email ||
+        req.body?.username ||
+        "unknown-user";
       const method = req.method ?? "unknown-method";
       const endpoint = req.path ?? "unknown-endpoints";
       return `${ip}:${username}:${method}:${endpoint}`;
