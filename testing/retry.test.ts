@@ -10,7 +10,7 @@ describe("retryHandler Tests", () => {
     [9, 8, "Success"],
   ])(
     "Success test cases of retry handler",
-    async (failCount, maxRetry, expectedResult) => {
+    async (failCount:number, maxRetry:number, expectedResult:string) => {
       let count = 0;
       let res = await retryHandler({
         fn: async () => {
