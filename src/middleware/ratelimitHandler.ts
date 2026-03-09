@@ -1,36 +1,107 @@
 import { NextFunction, Request, Response } from "express";
-import { RateLimiterRedis } from "rate-limiter-flexible";
+import {
+  RateLimiterRedis,
+  RateLimiterMemory,
+  RateLimiterMongo,
+} from "rate-limiter-flexible";
 import { createRedisClient } from "../config/redis.js";
 
 type RedisClient = ReturnType<typeof createRedisClient>;
 
 type rateLimitOptions = {
+  rateLimiter: RateLimiterRedis | RateLimiterMemory | RateLimiterMongo;
+  keyGenerator?: (req: Request) => string;
+  enableHeaders?: boolean;
+};
+
+type BasicRedisOptions = {
   client: RedisClient;
-  maxRequests?: number;
-  durationInSec?: number;
+  points?: number;
+  duration?: number;
+  blockDuration?: number;
+  keyPrefix?: string;
+  execEvenly?: boolean;
+};
+
+export const RateLimiterFactory = {
+  basicRedis: ({
+    client,
+    points = 5,
+    duration = 60,
+    blockDuration = 0,
+    keyPrefix = "rate-limit",
+    execEvenly = false,
+  }: BasicRedisOptions): RateLimiterRedis => {
+    return new RateLimiterRedis({
+      storeClient: client,
+      points,
+      duration,
+      blockDuration,
+      keyPrefix,
+      execEvenly,
+    });
+  },
+
+  advancedRedis: (
+    options: ConstructorParameters<typeof RateLimiterRedis>[0],
+  ): RateLimiterRedis => {
+    return new RateLimiterRedis(options);
+  },
+
+  inMemoryLimiter: (
+    options: ConstructorParameters<typeof RateLimiterMemory>[0],
+  ): RateLimiterMemory => {
+    return new RateLimiterMemory(options);
+  },
+
+  mongoLimiter: (
+    options: ConstructorParameters<typeof RateLimiterMongo>[0],
+  ): RateLimiterMongo => {
+    return new RateLimiterMongo(options);
+  },
 };
 
 export const rateLimitHandler = ({
-  client,
-  maxRequests = 5,
-  durationInSec = 60,
+  rateLimiter,
+  enableHeaders = false,
+  keyGenerator = (req: Request) => {
+    const ip = req.ip ?? "unknown-ip";
+    const username =
+      req.body?.email ||
+      req.body?.username ||
+      "unknown-user";
+    const method = req.method ?? "unknown-method";
+    const endpoint = req.path ?? "unknown-endpoints";
+    return `${ip}:${username}:${method}:${endpoint}`;
+  },
 }: rateLimitOptions) => {
-  const rateLimiter = new RateLimiterRedis({
-    storeClient: client,
-    points: maxRequests,
-    duration: durationInSec,
-  });
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await rateLimiter.consume(req.ip!);
+      const key = keyGenerator(req);
 
-      console.log("IP:", req.ip);
+      const result = await rateLimiter.consume(key);
+
+      if (enableHeaders) {
+        res.setHeader("RateLimit-Limit", rateLimiter.points);
+        res.setHeader("RateLimit-Remaining", result.remainingPoints);
+        res.setHeader("RateLimit-Reset", Math.ceil(result.msBeforeNext / 1000));
+      }
+
+      console.log("Key: ", key);
       console.log(`Request passed ${result.consumedPoints} times`);
+
       next();
-    } catch (error) {
-      // console.error("Rate Limit:", error);
-      console.log("Rate limit exceeded");
-      res.status(429).json({ message: "Too many requests" });
+    } catch (error: unknown) {
+      const err = error as { msBeforeNext?: number };
+      if (typeof err.msBeforeNext === "number") {
+        if (enableHeaders) {
+          res.setHeader("Retry-After", Math.ceil(err.msBeforeNext / 1000));
+        }
+        return res.status(429).json({ message: "Too many requests" });
+      }
+
+      console.error("Rate limiter error: ", error);
+      return res.status(503).json({ message: "Service Unavailable" });
     }
   };
 };
