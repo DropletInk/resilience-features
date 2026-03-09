@@ -91,10 +91,11 @@ export const rateLimitHandler = ({
       console.log(`Request passed ${result.consumedPoints} times`);
 
       next();
-    } catch (error: any) {
-      if (typeof error.msBeforeNext === "number") {
+    } catch (error: unknown) {
+      const err = error as { msBeforeNext?: number };
+      if (typeof err.msBeforeNext === "number") {
         if (enableHeaders) {
-          res.setHeader("Retry-After", Math.ceil(error.msBeforeNext / 1000));
+          res.setHeader("Retry-After", Math.ceil(err.msBeforeNext / 1000));
         }
         return res.status(429).json({ message: "Too many requests" });
       }

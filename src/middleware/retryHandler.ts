@@ -27,7 +27,6 @@ export const retryHandler = async <T>({
             console.log("Retry limit exceeded");
             return;
           }
-
           const delay =
             iniDelay * exBackoffMultiplier ** (error.attemptNumber - 1);
           console.log(
