@@ -1,44 +1,55 @@
 import pRetry from "p-retry";
 
-type RetryOptions<T> = {
+type BasicRetryOptions<T> = {
   fn: () => Promise<T>;
-  maxRetry?: number;
-  iniDelay?: number;
-  exBackoffMultiplier?: number;
+  retries?: number;
+  minTimeout?: number;
+  factor?: number;
 };
 
-export const retryHandler = async <T>({
+export const basicRetryHandler = async <T>({
   fn,
-  maxRetry = 3,
-  iniDelay = 1000,
-  exBackoffMultiplier = 2,
-}: RetryOptions<T>) => {
+  retries = 3,
+  minTimeout = 1000,
+  factor = 2,
+}: BasicRetryOptions<T>) => {
   try {
     const result = await pRetry(
       async () => {
         return await fn();
       },
       {
-        retries: maxRetry,
-        factor: exBackoffMultiplier,
-        minTimeout: iniDelay,
-        onFailedAttempt: (error: any) => {
+        retries: retries,
+        factor: factor,
+        minTimeout: minTimeout,
+        onFailedAttempt: (error) => {
           if (error.retriesLeft === 0) {
             console.log("Retry limit exceeded");
             return;
           }
           const delay =
-            iniDelay * exBackoffMultiplier ** (error.attemptNumber - 1);
+            minTimeout * factor ** (error.attemptNumber - 1);
           console.log(
-            `Attempt failed. Retrying in ${Math.round(delay / 1000)}s`,
+            `Attempt ${error.attemptNumber} failed. ${error.retriesLeft} retries left.  Retrying in ${Math.round(delay / 1000)}s`,
           );
         },
       },
     );
-    console.log("Success");
     return result;
   } catch (error) {
     console.log("Request failed after retries");
     throw error;
   }
 };
+
+export const advancedRetryHandler = async <T>(
+  options: {
+    fn: () => Promise<T>;
+  } & Parameters<typeof pRetry>[1]
+): Promise<T> => {
+
+  const { fn, ...advanceRetryOptions } = options;
+
+  return pRetry(fn, advanceRetryOptions);
+
+}
