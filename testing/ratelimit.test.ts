@@ -37,7 +37,7 @@ describe("Rate limit testing", () => {
     [8, 7],
   ])(
     "ratelimit handler tests: %i requests with %i maxLimit",
-    async (requestCount, maxRequests) => {
+    async (requestCount: number, maxRequests: number) => {
       await client.flushAll();
 
       const req = {

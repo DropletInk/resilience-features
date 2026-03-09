@@ -3,7 +3,7 @@ name: Run Tests
 on:
   push:
     branches:
-      - 16-updating-the-feature-of-the-rate-limiting
+      - main
   pull_request:
     branches:
       - main
@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - run: npm install
       - run: npm run build
