@@ -5,8 +5,21 @@ type TimeoutOptions<T> = {
   time?: number;
 };
 
-export const timeoutHandler = <T>({ fn, time }: TimeoutOptions<T>) => {
+export const basicTimeoutHandler = async <T>({
+  fn,
+  time = 20000,
+}: TimeoutOptions<T>) => {
   return pTimeout(fn(), {
-    milliseconds: time || 10000,
+    milliseconds: time,
   });
+};
+
+export const advancedTimeoutHandler = async <T>(
+  options: {
+    fn: () => Promise<T>;
+  } & Parameters<typeof pTimeout>[1],
+): Promise<T> => {
+  const { fn, ...advancedTimeoutOptions } = options;
+
+  return pTimeout(fn(), advancedTimeoutOptions) as Promise<T>;
 };

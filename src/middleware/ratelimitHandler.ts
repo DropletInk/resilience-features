@@ -99,7 +99,6 @@ export const rateLimitHandler = ({
         }
         return res.status(429).json({ message: "Too many requests" });
       }
-
       console.error("Rate limiter error: ", error);
       return res.status(503).json({ message: "Service Unavailable" });
     }

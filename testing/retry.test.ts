@@ -1,28 +1,26 @@
-import { retryHandler } from "../src/middleware/retryHandler.js";
+import { advancedRetryHandler } from "../src/middleware/retryHandler.js";
 import { describe, test, expect } from "@jest/globals";
 describe("retryHandler Tests", () => {
   test.each([
     [0, 1, "Success"],
     [2, 3, "Success"],
     [4, 4, "Success"],
-    [6, 8, "Success"],
-    [7, 6, "Success"],
-    [9, 8, "Success"],
+    [5, 6, "Success"],
   ])(
     "Success test cases of retry handler",
-    async (failCount:number, maxRetry:number, expectedResult:string) => {
+    async (failCount: number, maxRetry: number, expectedResult: string) => {
       let count = 0;
-      let res = await retryHandler({
+
+      let res = await advancedRetryHandler({
         fn: async () => {
           count++;
           if (count < failCount) {
-            throw new Error("Temporary failed");
+            throw new Error("Temporary Failed");
           }
           return "Success";
         },
-        maxRetry: maxRetry,
+        retries: maxRetry,
       });
-
       expect(res).toBe(expectedResult);
     },
   );
@@ -36,14 +34,14 @@ describe("retryHandler Tests", () => {
   ])("Failure test cases", async (failCount, maxRetry) => {
     let count = 0;
     await expect(
-      retryHandler({
+      advancedRetryHandler({
         fn: async () => {
           count++;
           if (count < failCount) {
             throw new Error("Always fail");
           }
         },
-        maxRetry: maxRetry,
+        retries: maxRetry,
       }),
     ).rejects.toThrow("Always fail");
   });

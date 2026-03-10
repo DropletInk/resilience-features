@@ -43,50 +43,93 @@ await client.connect();
 ```
 
 ### Use of Retry Handler
+The library provides retry functionality built using the `p-retry` library.
+It supports both basic retry configuration and advanced configuration.
+
+**Import**
+```ts
+import { BasicRetryHandler, advancedRetryHandler } from "resilience-library";
+```
+**Basic Retry Handler**
+
+The basic retry handler provides controlled configuration of retry features.
 
 #### Example
 
 ```ts
-import { retryHandler } from "resilience-library";
+import { basicRetryHandler } from "resilience-library";
 
 await retryHandler({
   fn: async () => fetchData(),
-  maxRetry: 3,
-  iniDelay: 1000, // initial delay in ms
-  exBackoffMultiplier: 2,
+  retries: 3,
+  minTimeout: 1000, // initial delay in ms
+  factor: 2,
 });
 ```
 
 In the above example,
 
-**`fn`:** This is a asynchronous function that you actually want to execute with the retry logic.
+- **`fn`:** This is a asynchronous function that you actually want to execute with the retry logic.
 
-**`maxRetry`:**
+- **`retries`:**
 
 This defines the maximum number of retry attempts allowed after the initial failure. If retry limit exceeded it throws an error.
 
-`Default` value is `3`. The value of maxRetry is also configurable.
+`Default` value is `3`. The value of `retries` is also configurable.
 
-**`iniDelay`:**
+- **`minTimeout`:**
 
 This specifies the initial delay after the initial failure.
 
-`Default` value is `1000` ms. The value of the `iniDelay` is configurable. The value of the `iniDelay` needs to be provided in milliseconds.
+`Default` value is `1000` ms. The value of the `minTimeout` is configurable. The value of the `minTimeout` needs to be provided in milliseconds.
 
-**`exBackoffMultiplier`:**
+- **`factor`:**
 
 This controls exponential backoff behavior. After each retry failed attempt it increases the delay time.
 
-`Default` value is 2. The value of `exBackoffMultiplier` is also configurable.
+`Default` value is 2. The value of `factor` is also configurable.
+
+**Advanced Retry Handler**
+
+The advanced retry handler provide access to all the options provided by the `p-retry` library. User can configure based on their requirements.
+
+#### Example
+```ts
+import { advancedRetryHandler } from "resilience-library";
+
+await advancedRetryHandler({
+  fn: async () => fetchData(),
+  retries: 5,
+  factor: 2,
+  minTimeout: 500,
+  maxTimeout: 5000,
+  .
+  .
+  .
+});
+
+```
+
 
 ### Use of Timeout Handler
+
+The library provides timeout handling functionality built using the `p-timeout` library.
+It supports both basic timeout configuration and advanced configuration.
+
+**Import**
+```ts
+import { basicTimeoutHandler, advancedTimeoutHandler } from "resilience-library";
+```
+**Basic Timeout Handler**
+
+The basic timeout handler provides controlled configuration of retry features.
 
 #### Example
 
 ```ts
-import { timeoutHandler } from "resilience-library";
+import { basicTimeoutHandler } from "resilience-library";
 
-await timeoutHandler({
+await basicTimeoutHandler({
   fn: async () => fetchData(),
   time: 10000, //timeout time in ms
 });
@@ -102,6 +145,25 @@ This specifies the maximum time the function is allowed to run before timing out
 If the function execution exceeds the specified time, the timeout handler rejects the operation with a timeout error.
 
 `Default` value is `10000`ms. The value of `time` is also configurable. The value of time needs to be provided in milliseconds.
+
+**Advanced Timeout Handler**
+The advanced timeout handler provide access to all the options provided by the `p-timeout` library. User can configure based on their requirements.
+
+#### Example
+
+```ts
+import { advancedTimeoutHandler } from "resilience-library";
+
+await advancedTimeoutHandler({
+  fn: async () => fetchData(),
+  milliseconds:1000,
+  message: "Operation Timed out"
+  .
+  .
+  .
+});
+```
+
 
 ### Use of Rate Limiting Handler
 
@@ -140,8 +202,6 @@ app.use(
     keyGenerator = (req) => {
       const ip = req.ip ?? "unknown-ip";
       const username =
-        (req as any).user?.email ||
-        (req as any).user?.username ||
         req.body?.email ||
         req.body?.username ||
         "unknown-user";
@@ -188,7 +248,7 @@ Duration in seconds to block requests after limit exceeded.
 
 - **`keyGenerator`**
 
-It is the function to generate custom key for rate limiting.
+It is the function to generate custom key for rate limiting. User can configure based on their requirements.
 
 `Default`: Uses IP, username, HTTP method and endpoint path if available.
 
