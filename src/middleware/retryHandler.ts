@@ -38,10 +38,12 @@ export const basicRetryHandler = async <T>({
     );
     return result;
   } catch (error:unknown) {
-    console.log("Request failed after retries");
+    if (error instanceof Error) {
+    console.error('An error occurred after maximum number of retries:', error.message);
     throw error;
   }
 };
+}
 
 export const advancedRetryHandler = async <T>(
   options: {
