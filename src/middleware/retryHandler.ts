@@ -37,7 +37,7 @@ export const basicRetryHandler = async <T>({
       },
     );
     return result;
-  } catch (error) {
+  } catch (error:unknown) {
     console.log("Request failed after retries");
     throw error;
   }
