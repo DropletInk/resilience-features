@@ -1,4 +1,5 @@
 import pRetry from "p-retry";
+import { RetryContext } from "p-retry";
 
 type BasicRetryOptions<T> = {
   fn: () => Promise<T>;
@@ -12,7 +13,7 @@ export const basicRetryHandler = async <T>({
   retries = 3,
   minTimeout = 1000,
   factor = 2,
-}: BasicRetryOptions<T>) => {
+}: BasicRetryOptions<T>)=> {
   try {
     const result = await pRetry(
       async () => {
@@ -22,7 +23,7 @@ export const basicRetryHandler = async <T>({
         retries: retries,
         factor: factor,
         minTimeout: minTimeout,
-        onFailedAttempt: (error) => {
+        onFailedAttempt: (error:RetryContext) => {
           if (error.retriesLeft === 0) {
             console.log("Retry limit exceeded");
             return;
