@@ -34,6 +34,7 @@ export const RateLimiterFactory = {
   }: BasicRedisOptions): RateLimiterRedis => {
     return new RateLimiterRedis({
       storeClient: client,
+      useRedisPackage: true,
       points,
       duration,
       blockDuration,
