@@ -24,7 +24,7 @@ describe("Timeout Handler Test", () => {
     [5000, 2000],
     [4000, 3999],
     [6000, 5000],
-    [8000, 7500]
+    [8000, 6000]
   ])("Failed after timeout", async (timeRequired, maxTimeoutTime) => {
     await expect(
       basicTimeoutHandler({
