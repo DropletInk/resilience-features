@@ -26,21 +26,6 @@ npm install git+https://github.com/DropletInk/resilience-features.git
 
 ## Usage Examples
 
-### Create and Connect redis client
-
-Redis is required only for rate limiting.
-
-#### Example
-
-```ts
-import { createRedisClient } from "resilience-library";
-
-const client = createRedisClient({
-  url: "redis://localhost:6379",
-});
-
-await client.connect();
-```
 
 ### Use of Retry Handler
 The library provides retry functionality built using the `p-retry` library.
