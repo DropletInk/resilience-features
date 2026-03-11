@@ -26,8 +26,10 @@
     "p-retry": "^7.1.1",
     "p-timeout": "^7.0.1",
     "rate-limiter-flexible": "^9.1.1",
-    "redis": "^4.7.1"
   },
+  "peerDependencies": {
+  "redis": "^4.7.0"
+},
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
