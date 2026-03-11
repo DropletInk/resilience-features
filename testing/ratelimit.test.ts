@@ -2,8 +2,8 @@ import {
   rateLimitHandler,
   RateLimiterFactory,
 } from "../src/middleware/ratelimitHandler.js";
-import { createRedisClient } from "../src/config/redis.js";
 import { Request, Response } from "express";
+import { createClient, RedisClientType } from "redis";
 import {
   describe,
   test,
@@ -13,11 +13,13 @@ import {
   jest,
 } from "@jest/globals";
 
-const client = createRedisClient({
-  url: "redis://localhost:6379",
-});
+let client: RedisClientType;
 
 beforeAll(async () => {
+  client = createClient({
+    url: "redis://localhost:6379",
+  });
+
   await client.connect();
 });
 
@@ -67,6 +69,6 @@ describe("Rate limit testing", () => {
       }
 
       expect(next).toHaveBeenCalledTimes(Math.min(requestCount, maxRequests));
-    },
+    }
   );
 });
