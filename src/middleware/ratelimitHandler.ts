@@ -4,8 +4,8 @@ import {
   RateLimiterMemory,
   RateLimiterMongo,
 } from "rate-limiter-flexible";
-import { RedisClientType } from "redis";
-type RedisClient = RedisClientType;
+import { createClient } from "redis";
+type RedisClient = ReturnType<typeof createClient>;
 
 type rateLimitOptions = {
   rateLimiter: RateLimiterRedis | RateLimiterMemory | RateLimiterMongo;
