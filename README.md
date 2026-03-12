@@ -33,7 +33,7 @@ It supports both basic retry configuration and advanced configuration.
 
 **Import**
 ```ts
-import { BasicRetryHandler, advancedRetryHandler } from "resilience-library";
+import { basicRetryHandler, advancedRetryHandler } from "resilience-library";
 ```
 **Basic Retry Handler**
 
@@ -163,13 +163,14 @@ import { RateLimiterFactory, rateLimitHandler } from "resilience-library";
 #### Use of Basic Redis Rate Limiter
 
 ```ts
-import { createRedisClient } from "resilience-library";
 import { RateLimiterFactory, rateLimitHandler } from "resilience-library";
+import { createClient, RedisClientType } from "redis";
 
-const client = createRedisClient({
-  url: "redis://localhost:6379",
-});
+let client: RedisClientType;
 
+client = createClient({
+    url: "redis://localhost:6379",
+  });
 await client.connect();
 
 const limiter = RateLimiterFactory.basicRedis({
@@ -317,6 +318,7 @@ Once a limiter is created , we can use it using `rateLimitHandler`
 app.use(
   rateLimitHandler({
     rateLimiter: limiter,
+    keyGenerator: . . .
   }),
 );
 ```
