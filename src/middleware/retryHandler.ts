@@ -26,7 +26,6 @@ export const basicRetryHandler = async <T>({
         onFailedAttempt: (error:RetryContext) => {
           if (error.retriesLeft === 0) {
             console.log("Retry limit exceeded");
-            return;
           }
           const delay =
             minTimeout * factor ** (error.attemptNumber - 1);
@@ -42,6 +41,8 @@ export const basicRetryHandler = async <T>({
     console.error('An error occurred after maximum number of retries:', error.message);
     throw error;
   }
+
+  throw new Error('Unknown error during retry');
 };
 }
 
