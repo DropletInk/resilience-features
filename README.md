@@ -256,7 +256,7 @@ Adds rate limit headers in response:
 
 4. Retry-After
 
-`Default`: false
+`Default`: true
 
 #### Use of Advanced Redis Rate Limiting Handler
 

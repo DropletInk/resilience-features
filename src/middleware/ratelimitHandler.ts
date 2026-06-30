@@ -64,7 +64,7 @@ export const RateLimiterFactory = {
 
 export const rateLimitHandler = ({
   rateLimiter,
-  enableHeaders = false,
+  enableHeaders = true,
   keyGenerator = (req: Request) => {
     const ip = req.ip ?? "unknown-ip";
     const username =
